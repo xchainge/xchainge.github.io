@@ -1,14 +1,18 @@
 $(function(){
+    var send = function(a,b,c,d){
+        var tracker = ga.getAll()[0];
+        tracker.send(a,b,c,d);
+    } 
     $(".ga-subscribe-up").on("click", function(){
-        ga('send',  'event',  'button', 'onclick', 'showXChaingePopUp()');
+        send('event',  'button', 'onclick', 'showXChaingePopUp()');
     });    
     $(".ga-subscribe").on("click", function(){
-        ga('send',  'event',  'button', 'submit', 'subscribe');
+        send('event',  'button', 'submit', 'subscribe');
     });
     $(".ga-onepaper").on("click", function(){
-        ga('send', 'event',  'button', 'onclick', 'onepaper');
+        send('event',  'button', 'onclick', 'onepaper');
     });
     $(".ga-whitepaper").on("click", function(){
-        ga('send',  'event',  'button', 'onclick', 'whitepaper');
+        send('event',  'button', 'onclick', 'whitepaper');
     });
 });
