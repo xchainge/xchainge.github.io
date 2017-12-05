@@ -404,9 +404,9 @@ function updateData(data) {
   }
   searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
-  $($(".token-info .container .bottom p")[0]).text(data.status.price / 1e18 + " ETH/XCH")
-  $($(".token-info .container .bottom p")[1]).text(data.status.raised_eth / data.status.price + "XCH")
-  $($(".token-info .container .bottom p")[2]).text(data.status.raised_eth / 1e18 + " ETH")
+  $($(".token-info .container .bottom p")[0]).text(Math.round(data.status.price / 1e15) / 1e3 + " ETH/XCH")
+  $($(".token-info .container .bottom p")[1]).text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + " XCH")
+  $($(".token-info .container .bottom p")[2]).text(Math.round(data.status.raised_eth / 1e15) / 1e3 + " ETH")
  
   if (auction_stage >= 3) {
     var raised = (data.status['raised_eth'] / wei) || nowY;
