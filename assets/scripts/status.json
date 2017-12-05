@@ -1,0 +1,22 @@
+{
+    "histogram": {
+        "timestamped_bins": [], 
+        "block_bins": [], 
+        "bin_sum": [], 
+        "bin_cumulative_sum": []
+    }, 
+    "status": {
+        "auction_stage": 1, 
+        "price": 0, 
+        "raised_eth": 0, 
+        "final_price": 0, 
+        "claimed_tokens": 0, 
+        "timestamp": 1510025197, 
+        "start_time": 1512468000, 
+        "end_time": 1514757600, 
+        "price_start": 50000000000000000, 
+        "price_constant": 541000000000, 
+        "price_exponent": 2, 
+        "auction_contract_address": "0xec41cdb6ca4910486d875a2cf1fac1159d1b2bdf"
+    }
+}
