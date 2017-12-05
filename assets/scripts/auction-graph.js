@@ -404,8 +404,7 @@ function updateData(data) {
   }
   searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
-  console.log(data.status);
-  
+ 
   if (auction_stage >= 3) {
     var raised = (data.status['raised_eth'] / wei) || nowY;
     
