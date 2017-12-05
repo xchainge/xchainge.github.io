@@ -360,7 +360,7 @@ function updateData(data) {
   
   var fundsRaisedData = [];
   
-  var target = [];
+  var target = [{x:0}];
   var auction_stage = data.status.auction_stage;
 
   if (data.histogram && data.histogram.bin_cumulative_sum) {
