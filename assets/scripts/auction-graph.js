@@ -430,7 +430,7 @@ function updateDataAPI() {
     } else if (!updateIntervalId) {
       updateIntervalId = setInterval(function() {
         updateData(data);
-      }, 1e5);
+      }, 1e6);
     }
   })
   .fail(function(jqxhr, textStatus, error) {
