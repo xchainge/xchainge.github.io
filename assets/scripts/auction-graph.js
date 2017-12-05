@@ -404,6 +404,9 @@ function updateData(data) {
   }
   searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
+  $($(".token-info .container .bottom p")[0]).text(data.status.price / 1e18 + " ETH/XCH")
+  $($(".token-info .container .bottom p")[1]).text(data.status.raised_eth / data.status.price + "XCH")
+  $($(".token-info .container .bottom p")[2]).text(data.status.raised_eth / 1e18 + " ETH")
  
   if (auction_stage >= 3) {
     var raised = (data.status['raised_eth'] / wei) || nowY;
@@ -427,7 +430,7 @@ function updateDataAPI() {
     } else if (!updateIntervalId) {
       updateIntervalId = setInterval(function() {
         updateData(data);
-      }, 1e4);
+      }, 1e5);
     }
   })
   .fail(function(jqxhr, textStatus, error) {
