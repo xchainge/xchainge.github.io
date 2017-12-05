@@ -355,7 +355,11 @@ function searchFor(arr, key, term) {
 }
 
 function updateData(data) {
+  
   var fundsRaisedData = [];
+  
+  var target = [{x:0}];
+  var auction_stage = data.status.auction_stage;
 
   if (data.histogram && data.histogram.bin_cumulative_sum) {
     data.histogram.bin_cumulative_sum.forEach(function(bin, i) {
@@ -391,103 +395,6 @@ function updateData(data) {
 
   var nowY = fundsRaisedData[fundsRaisedData.length - 1].y;
 
-  // change min y values to 1k after price goes above 5k
-  var ticksMin = searchFor(chart.config.options.scales.yAxes, 'id', 'funding').ticks.min;
-  if (nowY > 5e3 && ticksMin < 10) {
-    searchFor(chart.config.options.scales.yAxes, 'id', 'funding').ticks.min *= 1e3;
-    searchFor(chart.config.options.scales.yAxes, 'id', 'price').ticks.min *= 1e3;
-  } else if (nowY < 0.998) {
-    for (i = 1; i < target.length && 1.0 < target[i].y; i++);
-    if (i >= target.length) {
-      i = target.length-1;
-    }
-    endTime = target[i].x;
-  }
-
-  // maxTime will be the point of target with value nowY
-  for (i = 1; i < target.length && nowY < target[i].y; i++);
-  if (i >= target.length) {
-    i = target.length-1;
-  }
-
- // var slope = (target[i].y - target[i-1].y) / (target[i].x.getTime() - target[i-1].x.getTime()) ; // dy/dx == delta
- // maxTime = new Date((nowY - target[i-1].y) / slope + target[i-1].x.getTime());
-  //if (isNaN(maxTime.getTime())) {
-    maxTime = endTime;
-  //}
-
-  // targetValue is the value of fundingTarget on nowX
-  var targetValue,
-      statusTargetValue = data.status['price'] * totalIssued / wei;
-  if (auction_stage >= 3) {
-    maxTime = nowX;
-    targetValue = nowY;
-  } else if (nowX.getTime() >= maxTime.getTime()) {
-    nowX = maxTime;
-    targetValue = nowY;
-  } else {
-    targetValue = getCurrentPriceAt(nowX) * totalIssued;
-    var contractPrice = getPrice(
-      data.status.price_start,
-      data.status.price_constant,
-      data.status.price_exponent,
-      (nowX.getTime() - startTime.getTime()) / 1e3
-    ) * totalIssued / wei,
-        statusTimeValue = getPrice(
-          data.status.price_start,
-          data.status.price_constant,
-          data.status.price_exponent,
-          data.status.timestamp - (startTime.getTime() / 1e3)
-        ) * totalIssued / wei ;
-    console.debug('targetValue relative diff =',
-      Math.abs(statusTimeValue - statusTargetValue)/statusTargetValue,
-      Math.abs(targetValue - contractPrice)/contractPrice);
-  }
-
-  if (maxTime < endTime) {
-    target.length = i+1;
-    target[i] = {x: maxTime, y: nowY};
-  }
-
-  if (nowX < maxTime) {
-    chart.config.vLine = [
-      {x: nowX, color: '#FF2E63', top: targetValue},
-      {x: maxTime, dashed: true}
-    ];
-  } else {
-    maxTime = nowX;
-    chart.config.vLine = [{x: maxTime, dashed: false}];
-  }
-  if (clicked) {
-    chart.config.vLine.push({x: clicked.x, color: '#7777FFBB'});
-  }
-
-  endTime = new Date(Math.min(
-    endTime.getTime(),
-    maxTime.getTime() + (maxTime.getTime() - startTime.getTime()) * 0.1
-  ));
-  chart.config.options.scales.xAxes[0].time.max = endTime;
-  if (target.length < 100 && (target[1].x.getTime() - target[0].x.getTime()) > 120e3) {
-    target = getPriceCurve(startTime, endTime < maxTime ? endTime : maxTime, 60e3, data.status);
-    searchFor(chartData.datasets, 'label', 'Offered').data = target;
-  }
-
-  // x-axis ticks
-  var day = 86.4e6;
-  if (endTime.getTime() - startTime.getTime() < 1 * day) {
-    chart.config.options.scales.xAxes[0].time.unit = 'hour';
-    chart.config.options.scales.xAxes[0].time.unitStepSize = 1;
-  } else if (endTime.getTime() - startTime.getTime() < 2 * day) {
-    chart.config.options.scales.xAxes[0].time.unit = 'hour';
-    chart.config.options.scales.xAxes[0].time.unitStepSize = 4;
-  } else if (endTime.getTime() - startTime.getTime() < 7 * day) {
-    chart.config.options.scales.xAxes[0].time.unit = 'day';
-    chart.config.options.scales.xAxes[0].time.unitStepSize = 1;
-  } else if (endTime.getTime() - startTime.getTime() < 14 * day) {
-    chart.config.options.scales.xAxes[0].time.unit = 'day';
-    chart.config.options.scales.xAxes[0].time.unitStepSize = 2;
-  }
-
   // horizontal dotted line on nowY
   searchFor(chartData.datasets, 'label', 'Days').data = [{x: startTime, y: nowY}, {x: endTime, y: nowY}];
 
@@ -497,33 +404,21 @@ function updateData(data) {
   }
   searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
+  $($(".token-info .container .bottom p")[0]).text(Math.round(data.status.price / 1e13) / 1e5 + " ETH/XCH")
+  $($(".token-info .container .bottom p")[1]).text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + " XCH")
+  $($(".token-info .container .bottom p")[2]).text(Math.round(data.status.raised_eth / 1e13) / 1e5 + " ETH")
+ 
   if (auction_stage >= 3) {
     var raised = (data.status['raised_eth'] / wei) || nowY;
-    updateCurrentValues({ // defined in token.js
-      'auction_stage': auction_stage,
-      'current-target': targetValue,
-      'amount-raised': raised,
-      'current-end': maxTime,
-      'current-total': targetValue * 2,
-      'current-price': (data.status['final_price'] / wei) || (targetValue / totalIssued),
-      'total-issued': totalIssued,
-    });
+    
   } else {
-    updateCurrentValues({ // defined in token.js
-      'auction_stage': auction_stage,
-      'current-target': targetValue,
-      'amount-raised': nowY,
-      'current-end': maxTime,
-      'current-total': targetValue * 2,
-      'current-price': targetValue / totalIssued,
-      'total-issued': totalIssued,
-    });
+   
   }
   chart.update(0);
 }
 
 function updateDataAPI() {
-  $.getJSON('assets/scripts/status.json', {ts: ''+Date.now()})
+  $.getJSON('https://xcico.azurewebsites.net/api/info', {ts: ''+ Date.now()})
   .done(function(_data){
     data = _data;
     updateData(data);
@@ -535,7 +430,7 @@ function updateDataAPI() {
     } else if (!updateIntervalId) {
       updateIntervalId = setInterval(function() {
         updateData(data);
-      }, 1e3);
+      }, 1e6);
     }
   })
   .fail(function(jqxhr, textStatus, error) {
