@@ -6,7 +6,7 @@
         "bin_cumulative_sum": []
     }, 
     "status": {
-        "auction_stage": 2, 
+        "auction_stage": 1, 
         "price": 0, 
         "raised_eth": 0, 
         "final_price": 0, 
@@ -16,7 +16,7 @@
         "end_time": 1514757600, 
         "price_start": 50000000000000000, 
         "price_constant": 541000000000, 
-        "price_exponent": 3, 
+        "price_exponent": 2, 
         "auction_contract_address": "0xec41cdb6ca4910486d875a2cf1fac1159d1b2bdf"
     }
 }
