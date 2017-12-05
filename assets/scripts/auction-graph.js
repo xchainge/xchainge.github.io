@@ -378,10 +378,6 @@ function updateData(data) {
     );
   }
 
-  var target = searchFor(chartData.datasets, 'label', 'Offered').data,
-      i,
-      auction_stage = data.status['auction_stage'] || 2;
-
   // verticalLine
   var nowX = new Date(Math.max(
     Date.now(),
