@@ -355,7 +355,12 @@ function searchFor(arr, key, term) {
 }
 
 function updateData(data) {
+  
+  console.log(data)
+  
   var fundsRaisedData = [];
+  
+  var auction_stage = data.status.auction_stage;
 
   if (data.histogram && data.histogram.bin_cumulative_sum) {
     data.histogram.bin_cumulative_sum.forEach(function(bin, i) {
@@ -523,7 +528,7 @@ function updateData(data) {
 }
 
 function updateDataAPI() {
-  $.getJSON('assets/scripts/status.json', {ts: ''+Date.now()})
+  $.getJSON('https://xcico.azurewebsites.net/api/info', {ts: ''+ Date.now()})
   .done(function(_data){
     data = _data;
     updateData(data);
