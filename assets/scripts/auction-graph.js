@@ -384,8 +384,31 @@ function updateData(data) {
     fundsRaisedData[fundsRaisedData.length - 1].x.getTime(),
     startTime.getTime()
   ));
+  if (auction_stage >= 3 || Math.abs(nowX.getTime() - data.status['timestamp']*1e3) > 600e3) { // 10min deviation
+    nowX = fundsRaisedData[fundsRaisedData.length-1].x;
+  }
+  //var nowX = new Date(fundsRaisedData[fundsRaisedData.length - 1].x);
 
   var nowY = fundsRaisedData[fundsRaisedData.length - 1].y;
+
+  // change min y values to 1k after price goes above 5k
+  var ticksMin = searchFor(chart.config.options.scales.yAxes, 'id', 'funding').ticks.min;
+  if (nowY > 5e3 && ticksMin < 10) {
+    searchFor(chart.config.options.scales.yAxes, 'id', 'funding').ticks.min *= 1e3;
+    searchFor(chart.config.options.scales.yAxes, 'id', 'price').ticks.min *= 1e3;
+  } else if (nowY < 0.998) {
+    for (i = 1; i < target.length && 1.0 < target[i].y; i++);
+    if (i >= target.length) {
+      i = target.length-1;
+    }
+    endTime = target[i].x;
+  }
+
+  // maxTime will be the point of target with value nowY
+  for (i = 1; i < target.length && nowY < target[i].y; i++);
+  if (i >= target.length) {
+    i = target.length-1;
+  }
 
  // var slope = (target[i].y - target[i-1].y) / (target[i].x.getTime() - target[i-1].x.getTime()) ; // dy/dx == delta
  // maxTime = new Date((nowY - target[i-1].y) / slope + target[i-1].x.getTime());
