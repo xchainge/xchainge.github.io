@@ -384,10 +384,6 @@ function updateData(data) {
     fundsRaisedData[fundsRaisedData.length - 1].x.getTime(),
     startTime.getTime()
   ));
-  if (auction_stage >= 3 || Math.abs(nowX.getTime() - data.status['timestamp']*1e3) > 600e3) { // 10min deviation
-    nowX = fundsRaisedData[fundsRaisedData.length-1].x;
-  }
-  //var nowX = new Date(fundsRaisedData[fundsRaisedData.length - 1].x);
 
   var nowY = fundsRaisedData[fundsRaisedData.length - 1].y;
 
