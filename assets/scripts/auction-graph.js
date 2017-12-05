@@ -356,8 +356,6 @@ function searchFor(arr, key, term) {
 
 function updateData(data) {
   
-  console.log(data)
-  
   var fundsRaisedData = [];
   
   var target = [{x:0}];
@@ -430,7 +428,7 @@ function updateDataAPI() {
     } else if (!updateIntervalId) {
       updateIntervalId = setInterval(function() {
         updateData(data);
-      }, 1e3);
+      }, 1e4);
     }
   })
   .fail(function(jqxhr, textStatus, error) {
