@@ -406,27 +406,13 @@ function updateData(data) {
   }
   searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
+  console.log(data.status);
+  
   if (auction_stage >= 3) {
     var raised = (data.status['raised_eth'] / wei) || nowY;
-    updateCurrentValues({ // defined in token.js
-      'auction_stage': auction_stage,
-      'current-target': targetValue,
-      'amount-raised': raised,
-      'current-end': maxTime,
-      'current-total': targetValue * 2,
-      'current-price': (data.status['final_price'] / wei) || (targetValue / totalIssued),
-      'total-issued': totalIssued,
-    });
+    
   } else {
-    updateCurrentValues({ // defined in token.js
-      'auction_stage': auction_stage,
-      'current-target': targetValue,
-      'amount-raised': nowY,
-      'current-end': maxTime,
-      'current-total': targetValue * 2,
-      'current-price': targetValue / totalIssued,
-      'total-issued': totalIssued,
-    });
+   
   }
   chart.update(0);
 }
