@@ -117,13 +117,14 @@ function drawGraph() {
             var label = data.datasets[tooltipItem.datasetIndex].label;
             var y = tooltipItem.yLabel.toLocaleString(
               'en',
-              {maximumFractionDigits: label == "Price (ETH/XCH)" ? 7 : 2 }
+              {maximumFractionDigits: label == "Implied Market Cap (ETH)" ? 0 : 4 }
             );
+            return [label +': ' + y];
             //var price = (tooltipItem.yLabel / totalIssued).toLocaleString(
             //  'en',
             //  {maximumFractionDigits: 7}
             //);
-            //return [label +': ' + y, 'Price (ETH/XCH): ' + price];
+            //return [label +': ' + y, 'Price (ETH/XCH): ' + price];           
           }
         }
       },
