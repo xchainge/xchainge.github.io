@@ -230,6 +230,7 @@ function drawGraph() {
     setAlertsValue();
     updateData(data);
   });
+
 }
 
 function getPriceCurve(start, end, step) {
