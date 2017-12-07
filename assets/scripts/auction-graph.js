@@ -117,13 +117,14 @@ function drawGraph() {
             var label = data.datasets[tooltipItem.datasetIndex].label;
             var y = tooltipItem.yLabel.toLocaleString(
               'en',
-              {maximumFractionDigits: 2}
+              {maximumFractionDigits: label == "Implied Market Cap (ETH)" ? 0 : 4 }
             );
-            var price = (tooltipItem.yLabel / totalIssued).toLocaleString(
-              'en',
-              {maximumFractionDigits: 7}
-            );
-            return [label +': ' + y, 'Price (ETH/XCT): ' + price];
+            return [label +': ' + y];
+            //var price = (tooltipItem.yLabel / totalIssued).toLocaleString(
+            //  'en',
+            //  {maximumFractionDigits: 7}
+            //);
+            //return [label +': ' + y, 'Price (ETH/XCH): ' + price];           
           }
         }
       },
@@ -133,7 +134,7 @@ function drawGraph() {
           type: 'time',
           time: {
             unit: 'day',
-            unitStepSize: 2,
+            unitStepSize: 3,
             tooltipFormat: 'lll',
             min: startTime,
           },
@@ -159,7 +160,7 @@ function drawGraph() {
           },
           ticks: {
             fontColor: 'white',
-            min: 1,
+            min: 0.1,
             max: 1e6,
             autoSkip: false,
             callback: function(label) {
@@ -179,7 +180,7 @@ function drawGraph() {
             color: 'rgba(255, 255, 255, 0.2)',
           },
           afterBuildTicks: function(lineChart) {
-            lineChart.ticks = [1e1, 1e2, 1e3, 1e4, 1e5, 1e6];
+            lineChart.ticks = [1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6];
           },
           beforeUpdate: function(oScale) {
             return;
@@ -191,7 +192,7 @@ function drawGraph() {
           position: 'right',
           scaleLabel: {
             display: true,
-            labelString: 'Price (ETH/XCT)',
+            labelString: 'Price (ETH/XCH)',
             lineHeight: 2,
             fontColor: '#08D9D6',
             fontSize: 15,
@@ -404,9 +405,9 @@ function updateData(data) {
   }
   searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
-  $($(".token-info .container .bottom p")[0]).text(Math.round(data.status.price / 1e13) / 1e5 + " ETH/XCH")
-  $($(".token-info .container .bottom p")[1]).text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + " XCH")
-  $($(".token-info .container .bottom p")[2]).text(Math.round(data.status.raised_eth / 1e13) / 1e5 + " ETH")
+  $(".stat-price").text(Math.round(data.status.price / 1e13) / 1e5 + " ETH/XCH")
+  $(".stat-sold").text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + " XCH")
+  $(".stat-eth").text(Math.round(data.status.raised_eth / 1e13) / 1e5 + " ETH")
  
   if (auction_stage >= 3) {
     var raised = (data.status['raised_eth'] / wei) || nowY;
@@ -422,16 +423,16 @@ function updateDataAPI() {
   .done(function(_data){
     data = _data;
     updateData(data);
-    if (data.status.auction_stage >= 3) {
-      clearInterval(pollIntervalId);
-      pollIntervalId = null;
-      clearInterval(updateIntervalId);
-      updateIntervalId = null;
-    } else if (!updateIntervalId) {
-      updateIntervalId = setInterval(function() {
-        updateData(data);
-      }, 1e6);
-    }
+    //if (data.status.auction_stage >= 3) {
+     // clearInterval(pollIntervalId);
+     // pollIntervalId = null;
+     // clearInterval(updateIntervalId);
+     // updateIntervalId = null;
+    //} else if (!updateIntervalId) {
+    //  updateIntervalId = setInterval(function() {
+    //    updateData(data);
+     // }, 1e6);
+   // }
   })
   .fail(function(jqxhr, textStatus, error) {
     var err = textStatus + ', ' + error;
@@ -444,4 +445,13 @@ function clearClickedVline() {
   updateData(data);
 }
 
-$(document).ready(function() { getInitialData(); });
+function leadZero(n) { return (n < 10 ? '0' : '') + n; }
+
+$(document).ready(function() { getInitialData(); setInterval(function() {
+  
+  $(".stat-remainding").text( (leadZero(Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000*60*60*24)))+" ")
+                             +(leadZero(Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000*60*60)) - Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000*60*60*24))*24)+":")
+                             +(leadZero(Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000*60)) - Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000*60*60))*60)+":")
+                             +(leadZero(Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000)) - Math.trunc((new Date("2017-12-30T20:00:00.000Z") - new Date()) / (1000*60))*60)));
+  
+},1000); });
