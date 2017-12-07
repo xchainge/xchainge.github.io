@@ -772,5 +772,270 @@ $(function () {
 });
 //# sourceMappingURL=ga.js.map
 
-"use strict";
+'use strict';
+
+/**
+ * Checks if the given string is an address
+ *
+ * @method isAddress
+ * @param {String} address the given HEX adress
+ * @return {Boolean}
+ */
+var isAddress = function isAddress(address) {
+    if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false;else return true;
+},
+    validateEmail = function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+},
+    sendWallet = function sendWallet(wallet, ga, email) {
+    return $.ajax({
+        url: 'https://xcico.azurewebsites.net/api/users',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        // processData: false,
+        headers: {
+            // 'Accept': 'application/json',
+            // 'Content-Type': 'application/json',
+            // 'Cache-Control': 'no-cache'
+        },
+        data: JSON.stringify({
+            'Wallet': wallet,
+            'UserId': email,
+            'Email': ga
+        }),
+        success: function success(data) {
+            console.log('ok', data);
+        }
+    });
+};
+
+// $(document).ready(function(){
+$(function () {
+    var tracker;
+    var sendG = function sendG(a, b, c, d) {
+        tracker = ga.getAll()[0];
+        tracker.send(a, b, c, d);
+    };
+
+    $('.owl-carousel').owlCarousel({
+        center: false,
+        items: 3,
+        loop: false,
+        margin: 10,
+        stagePadding: 50,
+        nav: true,
+        responsive: {
+            600: {
+                items: 3
+            },
+            0: {
+                nav: false,
+                items: 1
+            }
+        }
+    });
+    $('#part').owlCarousel({
+        items: 4,
+        nav: true,
+        responsive: {
+            900: {
+                items: 4
+            },
+            600: {
+                items: 3
+            },
+            400: {
+                items: 2
+            },
+            0: {
+                items: 1
+            }
+        }
+    });
+    $('#press').owlCarousel({
+        items: 2,
+        nav: true,
+        responsive: {
+            900: {
+                items: 4
+            },
+            600: {
+                items: 3
+            },
+            400: {
+                items: 2
+            },
+            0: {
+                items: 1
+            }
+        }
+    });
+
+    $('[data-toggle="tooltip"]').tooltip();
+    var carousel = $('.carousel');
+    carousel.carousel({
+        interval: false
+    });
+
+    $('.js-modal-btn').modalVideo();
+    var offset = 300;
+
+    var navigationContainer = $('#cd-nav'),
+        mainNavigation = navigationContainer.find('#cd-main-nav ul');
+
+    //hide or show the "header" link
+    checkMenu();
+    $(window).scroll(function () {
+        checkMenu();
+    });
+
+    //open or close the header clicking on the bottom "header" link
+    $('.cd-nav-trigger').on('click', function () {
+        $(this).toggleClass('menu-is-open');
+        //we need to remove the transitionEnd event handler (we add it when scolling up with the header open)
+        mainNavigation.off('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend').toggleClass('is-visible');
+    });
+
+    function checkMenu() {
+        if ($(window).scrollTop() > offset && !navigationContainer.hasClass('is-fixed')) {
+            navigationContainer.addClass('is-fixed').find('.cd-nav-trigger').one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
+                mainNavigation.addClass('has-transitions');
+            });
+        } else if ($(window).scrollTop() <= offset) {
+            //check if the header is open when scrolling up
+            if (mainNavigation.hasClass('is-visible') && !$('html').hasClass('no-csstransitions')) {
+                //close the header with animation
+                mainNavigation.addClass('is-hidden').one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function () {
+                    //wait for the header to be closed and do the rest
+                    mainNavigation.removeClass('is-visible is-hidden has-transitions');
+                    navigationContainer.removeClass('is-fixed');
+                    $('.cd-nav-trigger').removeClass('menu-is-open');
+                });
+                //check if the header is open when scrolling up - fallback if transitions are not supported
+            } else if (mainNavigation.hasClass('is-visible') && $('html').hasClass('no-csstransitions')) {
+                mainNavigation.removeClass('is-visible has-transitions');
+                navigationContainer.removeClass('is-fixed');
+                $('.cd-nav-trigger').removeClass('menu-is-open');
+                //scrolling up with header closed
+            } else {
+                navigationContainer.removeClass('is-fixed');
+                mainNavigation.removeClass('has-transitions');
+            }
+        }
+    }
+
+    //////////// scroll to top
+    var offset_opacity = 1200,
+
+    //duration of the top scrolling animation (in ms)
+    scroll_top_duration = 700,
+
+    //grab the "back to top" link
+    $back_to_top = $('.cd-top');
+
+    //hide or show the "back to top" link
+    $(window).scroll(function () {
+        $(this).scrollTop() > offset ? $back_to_top.addClass('cd-is-visible') : $back_to_top.removeClass('cd-is-visible cd-fade-out');
+        if ($(this).scrollTop() > offset_opacity) {
+            $back_to_top.addClass('cd-fade-out');
+        }
+    });
+
+    //smooth scroll to top
+    $back_to_top.on('click', function (event) {
+        event.preventDefault();
+        $('body,html').animate({
+            scrollTop: 0
+        }, scroll_top_duration);
+    });
+
+    if ($('main').hasClass('bounty')) {
+        var stickyNavTop = $('.left-nav').offset().top;
+        var stickyFooter = $('footer').offset().top - $('.left-nav').outerHeight() - 50;
+
+        var stickyNav = function stickyNav() {
+            var scrollTop = $(window).scrollTop();
+
+            if (scrollTop > stickyFooter) $('.left-nav').css('z-index', -1);else $('.left-nav').css('z-index', 0);
+            // console.log(scrollTop, stickyFooter);
+
+            if (scrollTop > stickyNavTop - 20) {
+                $('.nav').addClass('sticky');
+            } else {
+                $('.nav').removeClass('sticky');
+            }
+        };
+
+        stickyNav();
+
+        $(window).scroll(function () {
+            stickyNav();
+        });
+    }
+
+    $('.nextStep button').on('click', function (e) {
+        tracker = ga.getAll()[0];
+        var gid = tracker.b.data.values[':_gid'];
+        // console.log(tracker.b.data.values[':_gid']);
+        // var gid = (tracker.b);
+        var button = this;
+        e.preventDefault();
+        var wallet = $('#enterWallet'),
+            less = false;
+
+        if (isAddress(wallet.val())) {
+            $(wallet).removeClass('error').addClass('success');
+            var wal = wallet.val();
+            // console.log(wal.substring(wallet.val().length-10));
+            // console.log(wal);
+            $('.walletInput').html(wallet.val().substring(0, 10) + '...' + wal.substring(wallet.val().length - 10));
+            if ($(button).hasClass('left')) {
+                less = true;
+                $(carousel).carousel(0);
+                carousel.carousel({
+                    interval: false
+                });
+                $('#accepted').show();
+                $('#count').html('Less than 20 ETH');
+                sendWallet(wallet.val(), 'less', gid);
+                tracker.send('event', 'button', 'onclick', 'less');
+            } else {
+                less = false;
+                $(carousel).carousel(2);
+                carousel.carousel({
+                    interval: false
+                });
+                $('#accepted').hide();
+                $('#count').html('More than 20 ETH');
+                tracker.send('event', 'button', 'onclick', 'more');
+                $('.continue-kyc').on('click', function (e) {
+                    var email = $('#emailKYC');
+                    e.preventDefault();
+                    sendWallet(wal, 'more', gid);
+                    if ($(email).val() != '' && validateEmail($(email).val())) {
+                        $(email).removeClass('error').addClass('success');
+                        $(carousel).carousel(0);
+                        carousel.carousel({
+                            interval: false
+                        });
+                        sendWallet(wal, $(email).val(), gid);
+                        tracker.send('event', 'button', 'onclick', 'continue');
+                    } else $(email).addClass('error').removeClass('success');
+                });
+            }
+        } else {
+            $(wallet).addClass('error').removeClass('success');
+        }
+        console.log();
+    });
+
+    function leadZero(n) {
+        return (n < 10 ? '0' : '') + n;
+    }
+    setInterval(function () {
+        $('.stat-remainding').html(leadZero(Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / (1000 * 60 * 60 * 24))) + 'D ' + (leadZero(Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / (1000 * 60 * 60)) - Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / (1000 * 60 * 60 * 24)) * 24) + ':') + (leadZero(Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / (1000 * 60)) - Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / (1000 * 60 * 60)) * 60) + ':') + leadZero(Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / 1000) - Math.trunc((new Date('2017-12-30T20:00:00.000Z') - new Date()) / (1000 * 60)) * 60));
+    }, 1000);
+});
 //# sourceMappingURL=main.js.map
