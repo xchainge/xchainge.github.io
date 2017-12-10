@@ -1,21 +1,20 @@
+'use strict';
+
 var wei = 1e18;
 var totalIssued;
 var startTime, endTime, maxTime;
-var chart = {}, chartData = {}, data;
+var chart = {},
+    chartData = {},
+    data;
 var pollIntervalId, updateIntervalId;
 var clicked;
 
 function getCurrentPriceAt(d) {
-    return getCurrentPrice(
-        data.status.price_start,
-        data.status.price_constant,
-        data.status.price_exponent,
-        (d.getTime() - startTime.getTime()) / 1e3
-    ) / wei;
+    return getCurrentPrice(data.status.price_start, data.status.price_constant, data.status.price_exponent, (d.getTime() - startTime.getTime()) / 1e3) / wei;
 }
 
 function detectmob() {
-    if(window.innerWidth <= 700 ) {
+    if (window.innerWidth <= 700) {
         return true;
     } else {
         return false;
@@ -23,10 +22,10 @@ function detectmob() {
 }
 
 var verticalLinePlugin = {
-    renderVerticalLine: function(chartInstance, line) {
+    renderVerticalLine: function renderVerticalLine(chartInstance, line) {
         // line = {x: number, top: number, bottom: number, color: string, dashed: boolean}
         if (!isNaN(line)) {
-            line = {x: line};
+            line = { x: line };
         } else {
             line = $.extend({}, line);
         }
@@ -66,9 +65,9 @@ var verticalLinePlugin = {
         // context.fillText('MY TEXT', lineLeftOffset, (scale.bottom - scale.top) / 2 + scale.top);
     },
 
-    afterDatasetsDraw: function(chart, easing) {
+    afterDatasetsDraw: function afterDatasetsDraw(chart, easing) {
         if (chart.config.vLine && chart.config.vLine.push) {
-            for (var i=0; i < chart.config.vLine.length; ++i) {
+            for (var i = 0; i < chart.config.vLine.length; ++i) {
                 var line = chart.config.vLine[i];
                 this.renderVerticalLine(chart, line);
             }
@@ -81,7 +80,7 @@ var verticalLinePlugin = {
 Chart.plugins.register(verticalLinePlugin);
 
 var backgroundColorPlugin = {
-    beforeDraw: function(chartInstance) {
+    beforeDraw: function beforeDraw(chartInstance) {
         var ctx = chartInstance.chart.ctx;
         ctx.fillStyle = 'transparent';
         ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
@@ -92,7 +91,7 @@ Chart.plugins.register(backgroundColorPlugin);
 
 function drawGraph() {
     var ctx = $('#auction-graph');
-    if(!detectmob()) {
+    if (!detectmob()) {
         chart = new Chart(ctx, {
             type: 'line',
             data: chartData,
@@ -108,7 +107,7 @@ function drawGraph() {
                         fontColor: 'white',
                         fontSize: 16,
                         boxWidth: 20,
-                        filter: function (item, data) {
+                        filter: function filter(item, data) {
                             return data.datasets[item.datasetIndex].legend !== false;
                         }
                     }
@@ -119,15 +118,12 @@ function drawGraph() {
                     intersect: false,
                     backgroundColor: '#404e9a',
                     callbacks: {
-                        footer: function (tooltipItem, data) {
-                            return ''
+                        footer: function footer(tooltipItem, data) {
+                            return '';
                         },
-                        label: function (tooltipItem, data) {
+                        label: function label(tooltipItem, data) {
                             var label = data.datasets[tooltipItem.datasetIndex].label;
-                            var y = tooltipItem.yLabel.toLocaleString(
-                                'en',
-                                {maximumFractionDigits: label == 'Implied Market Cap (ETH)' ? 0 : 4}
-                            );
+                            var y = tooltipItem.yLabel.toLocaleString('en', { maximumFractionDigits: label == 'Implied Market Cap (ETH)' ? 0 : 4 });
                             return [label + ': ' + y];
                             //var price = (tooltipItem.yLabel / totalIssued).toLocaleString(
                             //  'en',
@@ -145,14 +141,14 @@ function drawGraph() {
                             unit: 'day',
                             unitStepSize: 3,
                             tooltipFormat: 'lll',
-                            min: startTime,
+                            min: startTime
                         },
                         ticks: {
-                            fontColor: 'white', // this here
+                            fontColor: 'white' // this here
                         },
                         gridLines: {
-                            color: 'rgba(255, 255, 255, 0.2)',
-                        },
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        }
                     }],
                     yAxes: [{
                         id: 'fundingTarget',
@@ -172,10 +168,10 @@ function drawGraph() {
                             min: 0.1,
                             max: 1e6,
                             autoSkip: false,
-                            callback: function (label) {
+                            callback: function callback(label) {
                                 var digits = label.toString().length;
                                 if (label % 1 !== 0) {
-                                    return label
+                                    return label;
                                 } else if (digits >= 7) {
                                     return label / 1000000 + ' M';
                                 } else if (digits >= 4) {
@@ -186,12 +182,12 @@ function drawGraph() {
                             }
                         },
                         gridLines: {
-                            color: 'rgba(255, 255, 255, 0.2)',
+                            color: 'rgba(255, 255, 255, 0.2)'
                         },
-                        afterBuildTicks: function (lineChart) {
+                        afterBuildTicks: function afterBuildTicks(lineChart) {
                             lineChart.ticks = [1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6];
                         },
-                        beforeUpdate: function (oScale) {
+                        beforeUpdate: function beforeUpdate(oScale) {
                             return;
                         }
                     }, {
@@ -212,17 +208,17 @@ function drawGraph() {
                             min: 0,
                             max: 0.050,
                             autoSkip: false,
-                            callback: function (label) {
+                            callback: function callback(label) {
                                 return label;
                             }
                         },
                         gridLines: {
-                            color: 'rgba(8, 217, 214, 0.2)',
+                            color: 'rgba(8, 217, 214, 0.2)'
                         },
-                        afterBuildTicks: function (lineChart) {
+                        afterBuildTicks: function afterBuildTicks(lineChart) {
                             lineChart.ticks = [0.010, 0.020, 0.030, 0.040, 0.050];
                         },
-                        beforeUpdate: function (oScale) {
+                        beforeUpdate: function beforeUpdate(oScale) {
                             return;
                         }
                     }]
@@ -235,7 +231,7 @@ function drawGraph() {
             var d = chart.scales['x-axis-0'].getValueForPixel(pos.x).toDate();
             var val = getCurrentPriceAt(d) * totalIssued;
             console.log('$', d, val);
-            clicked = {x: d, y: val};
+            clicked = { x: d, y: val };
             setAlertsValue();
             updateData(data);
         });
@@ -248,13 +244,13 @@ function getPriceCurve(start, end, step) {
     while (i < end) {
         target.push({
             x: i,
-            y: getCurrentPriceAt(i) * totalIssued,
+            y: getCurrentPriceAt(i) * totalIssued
         });
         i = new Date(i.getTime() + step);
     }
     target.push({
         x: end,
-        y: getCurrentPriceAt(end) * totalIssued,
+        y: getCurrentPriceAt(end) * totalIssued
     });
     return target;
 }
@@ -265,100 +261,92 @@ function getPriceCurve2(start, end, step) {
     while (i < end) {
         target.push({
             x: i,
-            y: getCurrentPriceAt(i),
+            y: getCurrentPriceAt(i)
         });
         i = new Date(i.getTime() + step);
     }
     target.push({
         x: end,
-        y: getCurrentPriceAt(end),
+        y: getCurrentPriceAt(end)
     });
     return target;
 }
 
 // generates data for static funding target graph
 function getInitialData() {
-    $.when(
-        $.getJSON('assets/scripts/static.json'),
-        $.getJSON('assets/scripts/status.json', {ts: ''+Date.now()})
-    )
-        .done(function(staticRes, statusRes) {
-            $(window).trigger('resize');
-            data = statusRes[0];
-            var staticData = staticRes[0],
-                statusData = data.status;
+    $.when($.getJSON('assets/scripts/static.json'), $.getJSON('assets/scripts/status.json', { ts: '' + Date.now() })).done(function (staticRes, statusRes) {
+        $(window).trigger('resize');
+        data = statusRes[0];
+        var staticData = staticRes[0],
+            statusData = data.status;
 
-            if (statusData['auction_contract_address']) {
-                updateAuctionAddress(statusData['auction_contract_address']);
-            }
+        if (statusData['auction_contract_address']) {
+            updateAuctionAddress(statusData['auction_contract_address']);
+        }
 
-            totalIssued = staticData.tokensOffered;
-            startTime = new Date(statusData.start_time * 1000);
-            endTime = new Date((staticData.endDate || (statusData.start_time + 30*86.4e3)) * 1000);
-            maxTime = endTime;
+        totalIssued = staticData.tokensOffered;
+        startTime = new Date(statusData.start_time * 1000);
+        endTime = new Date((staticData.endDate || statusData.start_time + 30 * 86.4e3) * 1000);
+        maxTime = endTime;
 
-            var fundingTargetData = getPriceCurve(startTime, endTime, 3.6e6, statusData);
-            var fundingTargetData2 = getPriceCurve2(startTime, endTime, 3.6e6, statusData);
+        var fundingTargetData = getPriceCurve(startTime, endTime, 3.6e6, statusData);
+        var fundingTargetData2 = getPriceCurve2(startTime, endTime, 3.6e6, statusData);
 
-            chartData = {
-                datasets: [{
-                    yAxisID: 'price',
-                    label: 'Price (ETH)',
-                    borderWidth: 1.5,
-                    borderColor: '#08D9D6',
-                    data: fundingTargetData2,
-                    fill: false,
-                    radius: 0
-                },{
-                    yAxisID: 'fundingTarget',
-                    label: 'Implied Market Cap (ETH)',
-                    borderWidth: 1.5,
-                    borderColor: 'white',
-                    data: fundingTargetData,
-                    fill: false,
-                    radius: 0
-                }, {
-                    yAxisID: 'fundingTarget',
-                    label: 'Sent to Auction (ETH)',
-                    borderWidth: 1.5,
-                    borderColor: 'rgb(234, 234, 234)',
-                    backgroundColor: 'rgba(234, 234, 234, 0.25)',
-                    data: [],
-                    lineTension: 0,
-                    radius: 0
-                },{
-                    yAxisID: 'fundingTarget',
-                    label: 'Days To Target',
-                    borderColor: 'white',
-                    borderDash: [5,5],
-                    borderWidth: 1,
-                    fill: false,
-                    legend: false,
-                    data: [],
-                    lineTension: 0,
-                    radius: 0
-                }]
-            };
-            drawGraph();
-            updateDataAPI();
-            pollIntervalId = setInterval(updateDataAPI, 10e3);
+        chartData = {
+            datasets: [{
+                yAxisID: 'price',
+                label: 'Price (ETH)',
+                borderWidth: 1.5,
+                borderColor: '#08D9D6',
+                data: fundingTargetData2,
+                fill: false,
+                radius: 0
+            }, {
+                yAxisID: 'fundingTarget',
+                label: 'Implied Market Cap (ETH)',
+                borderWidth: 1.5,
+                borderColor: 'white',
+                data: fundingTargetData,
+                fill: false,
+                radius: 0
+            }, {
+                yAxisID: 'fundingTarget',
+                label: 'Sent to Auction (ETH)',
+                borderWidth: 1.5,
+                borderColor: 'rgb(234, 234, 234)',
+                backgroundColor: 'rgba(234, 234, 234, 0.25)',
+                data: [],
+                lineTension: 0,
+                radius: 0
+            }, {
+                yAxisID: 'fundingTarget',
+                label: 'Days To Target',
+                borderColor: 'white',
+                borderDash: [5, 5],
+                borderWidth: 1,
+                fill: false,
+                legend: false,
+                data: [],
+                lineTension: 0,
+                radius: 0
+            }]
+        };
+        drawGraph();
+        updateDataAPI();
+        pollIntervalId = setInterval(updateDataAPI, 10e3);
 
-            // auction start date
-            var val = startTime.toLocaleString(
-                'en-gb', // 24h clock
-                {month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'}
-            );
-            $('.auction-start').text(val);
-
-        })
-        .fail(function(jqxhr, textStatus, error) {
-            var err = textStatus + ', ' + error;
-            console.error('Request Failed: ', err);
-        });
+        // auction start date
+        var val = startTime.toLocaleString('en-gb', // 24h clock
+        { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        $('.auction-start').text(val);
+    }).fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ', ' + error;
+        console.error('Request Failed: ', err);
+    });
 }
 
 function searchFor(arr, key, term) {
-    for (var i=0; i<arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
         if (arr[i] && arr[i][key] && arr[i][key].toLowerCase().indexOf(term.toLowerCase()) >= 0) {
             return arr[i];
         }
@@ -369,11 +357,11 @@ function updateData(data) {
 
     var fundsRaisedData = [];
 
-    var target = [{x:0}];
+    var target = [{ x: 0 }];
     var auction_stage = data.status.auction_stage;
 
     if (data.histogram && data.histogram.bin_cumulative_sum) {
-        data.histogram.bin_cumulative_sum.forEach(function(bin, i) {
+        data.histogram.bin_cumulative_sum.forEach(function (bin, i) {
             if (i >= data.histogram.timestamped_bins.length) return;
             fundsRaisedData.push({
                 x: new Date(data.histogram.timestamped_bins[i] * 1000),
@@ -381,74 +369,56 @@ function updateData(data) {
             });
         });
     }
-    if (!fundsRaisedData.length){
-        fundsRaisedData = [
-            {x: startTime, y: 0},
-            {x: new Date(), y: 0},
-        ];
+    if (!fundsRaisedData.length) {
+        fundsRaisedData = [{ x: startTime, y: 0 }, { x: new Date(), y: 0 }];
     } else if (fundsRaisedData[0].x > startTime) {
-        fundsRaisedData.unshift(
-            {x: startTime, y: 0},
-            {x: new Date(fundsRaisedData[0].x.getTime()-1), y: 0}
-        );
+        fundsRaisedData.unshift({ x: startTime, y: 0 }, { x: new Date(fundsRaisedData[0].x.getTime() - 1), y: 0 });
     }
 
     // verticalLine
-    var nowX = new Date(Math.max(
-        Date.now(),
-        fundsRaisedData[fundsRaisedData.length - 1].x.getTime(),
-        startTime.getTime()
-    ));
-    if (auction_stage >= 3 || Math.abs(nowX.getTime() - data.status['timestamp']*1e3) > 600e3) { // 10min deviation
-        nowX = fundsRaisedData[fundsRaisedData.length-1].x;
+    var nowX = new Date(Math.max(Date.now(), fundsRaisedData[fundsRaisedData.length - 1].x.getTime(), startTime.getTime()));
+    if (auction_stage >= 3 || Math.abs(nowX.getTime() - data.status['timestamp'] * 1e3) > 600e3) {
+        // 10min deviation
+        nowX = fundsRaisedData[fundsRaisedData.length - 1].x;
     }
     //var nowX = new Date(fundsRaisedData[fundsRaisedData.length - 1].x);
 
     var nowY = fundsRaisedData[fundsRaisedData.length - 1].y;
 
     // horizontal dotted line on nowY
-    searchFor(chartData.datasets, 'label', 'Days').data = [{x: startTime, y: nowY}, {x: endTime, y: nowY}];
+    searchFor(chartData.datasets, 'label', 'Days').data = [{ x: startTime, y: nowY }, { x: endTime, y: nowY }];
 
     // funds raised
-    if (nowX > fundsRaisedData[fundsRaisedData.length-1].x) {
-        fundsRaisedData.push({x: nowX, y: nowY});
+    if (nowX > fundsRaisedData[fundsRaisedData.length - 1].x) {
+        fundsRaisedData.push({ x: nowX, y: nowY });
     }
     searchFor(chartData.datasets, 'label', 'Sent').data = fundsRaisedData;
 
-    $('.stat-price').text(Math.round(data.status.price / 1e13) / 1e5 + ' ETH/XCH')
-    $('.stat-sold').text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + ' XCH')
-    $('.stat-eth').text(Math.round(data.status.raised_eth / 1e13) / 1e5 + ' ETH')
+    $('.stat-price').text(Math.round(data.status.price / 1e13) / 1e5 + ' ETH/XCH');
+    $('.stat-sold').text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + ' XCH');
+    $('.stat-eth').text(Math.round(data.status.raised_eth / 1e13) / 1e5 + ' ETH');
 
-    if (auction_stage >= 3) {
-        var raised = (data.status['raised_eth'] / wei) || nowY;
-
-    } else {
-
-    }
-    if(chart.hasOwnProperty('update'))
-        chart.update(0);
+    chart.update(0);
 }
 
 function updateDataAPI() {
-    $.getJSON('https://xcico.azurewebsites.net/api/info', {ts: ''+ Date.now()})
-        .done(function(_data){
-            data = _data;
-            updateData(data);
-            //if (data.status.auction_stage >= 3) {
-            // clearInterval(pollIntervalId);
-            // pollIntervalId = null;
-            // clearInterval(updateIntervalId);
-            // updateIntervalId = null;
-            //} else if (!updateIntervalId) {
-            //  updateIntervalId = setInterval(function() {
-            //    updateData(data);
-            // }, 1e6);
-            // }
-        })
-        .fail(function(jqxhr, textStatus, error) {
-            var err = textStatus + ', ' + error;
-            console.error('Request Failed: ', err);
-        });
+    $.getJSON('https://xcico.azurewebsites.net/api/info', { ts: '' + Date.now() }).done(function (_data) {
+        data = _data;
+        updateData(data);
+        //if (data.status.auction_stage >= 3) {
+        // clearInterval(pollIntervalId);
+        // pollIntervalId = null;
+        // clearInterval(updateIntervalId);
+        // updateIntervalId = null;
+        //} else if (!updateIntervalId) {
+        //  updateIntervalId = setInterval(function() {
+        //    updateData(data);
+        // }, 1e6);
+        // }
+    }).fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ', ' + error;
+        console.error('Request Failed: ', err);
+    });
 }
 
 function clearClickedVline() {
@@ -456,6 +426,7 @@ function clearClickedVline() {
     updateData(data);
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     getInitialData();
 });
+//# sourceMappingURL=auction-graph.js.map
