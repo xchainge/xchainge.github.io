@@ -419,14 +419,7 @@ function updateData(data) {
     $('.stat-sold').text(Math.round(data.status.raised_eth / data.status.price * 1e3) / 1e3 + ' XCH')
     $('.stat-eth').text(Math.round(data.status.raised_eth / 1e13) / 1e5 + ' ETH')
 
-    if (auction_stage >= 3) {
-        var raised = (data.status['raised_eth'] / wei) || nowY;
-
-    } else {
-
-    }
-    if(chart.hasOwnProperty('update'))
-        chart.update(0);
+    chart.update(0);
 }
 
 function updateDataAPI() {
